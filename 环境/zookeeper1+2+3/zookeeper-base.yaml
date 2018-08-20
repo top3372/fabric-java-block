@@ -1,0 +1,22 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+
+  zookeeper:
+    image: hyperledger/fabric-zookeeper:x86_64-0.4.6
+    environment:
+      #
+      # server.x=[hostname]:nnnnn[:nnnnn]
+      # The list of servers that make up the ZK ensemble. The list that is used
+      # by the clients must match the list of ZooKeeper servers that each ZK
+      # server has. There are two port numbers `nnnnn`. The first is what
+      # followers use to connect to the leader, while the second is for leader
+      # election.
+      - ZOO_SERVERS=server.1=zookeeper1.ideal.com:2888:3888 server.2=zookeeper2.ideal.com:2888:3888 server.3=zookeeper3.ideal.com:2888:3888
+    restart: always
+
