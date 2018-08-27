@@ -3,8 +3,9 @@ package blockchain.controller;
 import blockchain.dto.*;
 import blockchain.dto.response.ResultInfo;
 import blockchain.enums.ResponseCodeEnum;
-import blockchain.service.ChainCodeService;
 
+
+import blockchain.service.ChainCodeServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class ChaincodeController {
 
 
     @Autowired
-    private ChainCodeService chainCodeService;
+    private ChainCodeServiceImpl chainCodeService;
 
     @RequestMapping(value = "/enroll", method = RequestMethod.POST)
     @ResponseBody
@@ -35,16 +36,8 @@ public class ChaincodeController {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }
             String result = chainCodeService.register(user.getUserName(), user.getPassWord(), user.getPeerWithOrg());
-            if (result != "Failed to enroll user") {
+            return new ResultInfo(ResponseCodeEnum.SUCCESS, result);
 
-//                String username = user.getUserName();
-
-//                jwtToken = Jwts.builder().setSubject(username).claim("roles", "user").setIssuedAt(new Date())
-//                        .signWith(SignatureAlgorithm.HS256, "secretkey").setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME)).compact();
-                return new ResultInfo(ResponseCodeEnum.SUCCESS, result);
-            } else {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "Failed to register user");
-            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());

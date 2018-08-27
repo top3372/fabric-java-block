@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 import blockchain.model.Org;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.engine.transaction.jta.platform.internal.SynchronizationRegistryBasedSynchronizationStrategy;
 import org.hyperledger.fabric.sdk.helper.Utils;
 
 /**

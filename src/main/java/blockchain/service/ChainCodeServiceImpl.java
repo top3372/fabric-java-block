@@ -4,9 +4,10 @@ package blockchain.service;
 import blockchain.config.Config;
 import blockchain.config.ConfigHelper;
 import blockchain.config.ConnectionUtil;
+import blockchain.dao.model.FabricCaUser;
 import blockchain.model.*;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.codec.binary.Hex;
+import org.bouncycastle.util.encoders.Hex;
 import org.apache.commons.io.IOUtils;
 import org.hyperledger.fabric.sdk.*;
 import org.hyperledger.fabric.sdk.exception.TransactionEventException;
@@ -15,12 +16,15 @@ import org.hyperledger.fabric_ca.sdk.*;
 import org.hyperledger.fabric_ca.sdk.exception.RegistrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
@@ -39,9 +43,12 @@ import static org.hyperledger.fabric.sdk.Channel.TransactionOptions.createTransa
 
 @PropertySource("hyperledger.properties")
 @Service("chainCodeService")
-public class ChainCodeServiceImpl implements ChainCodeService {
+public class ChainCodeServiceImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(ChainCodeServiceImpl.class);
+
+    @Autowired
+    private FabricCaUserServiceImpl fabricCaUserService;
 
     private static String PATH = System.getProperty("user.dir");
 
@@ -132,7 +139,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
     }
 
 
-    @Override
+
     public synchronized String register(String name, String password, String peerWithOrg) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
@@ -141,7 +148,8 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         HFCAClient ca = sampleOrg.getCAClient();
 
         String orgName = sampleOrg.getName();
-        String mspid = sampleOrg.getMSPID();
+        String msPid = sampleOrg.getMSPID();
+        String sampleOrgDomainName = sampleOrg.getDomainName();
         ca.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
 //            if (config.isRunningFabricTLS()) {
 //                final EnrollmentRequest enrollmentRequestTLS = new EnrollmentRequest();
@@ -164,30 +172,76 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         HFCAInfo info = ca.info(); //just check if we connect at all.
         String infoName = info.getCAName();
         logger.info("CAName: " + infoName);
-//            if (infoName != null && !infoName.isEmpty()) {
-//                //返回错误信息
-//
-//            }
-        HyperUser admin = new HyperUser(adminName, orgName);
+        if (infoName != null && !infoName.isEmpty()) {
+            //返回错误信息
+
+        }
+        FabricCaUser adminFabricCaUser = fabricCaUserService.selFabricCaUserByNameAndEnrollmentSecret(adminName,orgName,adminPwd);
+        HyperUser admin = null;
+        if(adminFabricCaUser == null) {
 
 
-        admin.setEnrollment(ca.enroll(admin.getName(), adminPwd));
-        admin.setMspId(mspid);
+            admin = new HyperUser(adminName, orgName);
 
-        HyperUser user = new HyperUser(name, orgName);
+            admin.setEnrollmentSecret(adminPwd);
+            admin.setEnrollment(ca.enroll(admin.getName(), adminPwd));
+            admin.setMspId(msPid);
 
-        RegistrationRequest rr = new RegistrationRequest(user.getName());
-        rr.setSecret(password);
+            fabricCaUserService.insertFabricCaUser(admin,peerWithOrg);
 
-        try {
-            user.setEnrollmentSecret(ca.register(rr, admin));
-        } catch (RegistrationException re) {
-            re.printStackTrace();
-            logger.error(re.getMessage());
-            throw re;
+        }else{
+            admin = fabricCaUserService.transferFabricCaUserToHyperUser(adminFabricCaUser);
         }
 
-        return "User " + name + " Registered Successfully";
+        FabricCaUser peerOrgAdminFabricCaUser = fabricCaUserService.selFabricCaUserByNameAndEnrollmentSecret(orgName + "Admin",orgName,"");
+        if( peerOrgAdminFabricCaUser == null) {
+            HyperUser peerOrgAdmin = new HyperUser(orgName + "Admin", orgName);
+            peerOrgAdmin.setMspId(msPid);
+
+            File certificateFile = Paths.get(config.getChannelPath(), "crypto-config/peerOrganizations/",
+                    sampleOrgDomainName, format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem",
+                            sampleOrgDomainName, sampleOrgDomainName))
+                    .toFile();
+            File privateKeyFile = ConnectionUtil.findFileSk(Paths.get(config.getChannelPath(),
+                    "crypto-config/peerOrganizations/", sampleOrgDomainName,
+                    format("/users/Admin@%s/msp/keystore", sampleOrgDomainName)).toFile());
+
+            String certificate = new String(IOUtils.toByteArray(new FileInputStream(certificateFile)), "UTF-8");
+
+            PrivateKey privateKey = Utils.getPrivateKeyFromBytes(IOUtils.toByteArray(new FileInputStream(privateKeyFile)));
+            peerOrgAdmin.setEnrollment(new SampleStoreEnrollement(privateKey, certificate));
+
+            fabricCaUserService.insertFabricCaUser(peerOrgAdmin,peerWithOrg);
+        }
+
+        FabricCaUser userFabricCaUser = fabricCaUserService.selFabricCaUserByNameAndEnrollmentSecret(name,orgName,password);
+        if(userFabricCaUser == null) {
+            HyperUser user = new HyperUser(name, orgName);
+
+            RegistrationRequest rr = new RegistrationRequest(user.getName());
+//            rr.setMaxEnrollments(1);
+            rr.setSecret(password);
+
+            try {
+                String secret = ca.register(rr, admin);
+                logger.info("****userName: " + user.getName() + ",password: " + password + ",secret: " + secret);
+                user.setEnrollmentSecret(secret);
+
+                Enrollment enrollment = ca.enroll(user.getName(), password);
+                user.setEnrollment(enrollment);
+                user.setMspId(msPid);
+
+
+                fabricCaUserService.insertFabricCaUser(user, peerWithOrg);
+
+
+            } catch (RegistrationException re) {
+                re.printStackTrace();
+                logger.error(re.getMessage());
+                throw re;
+            }
+        }
+        return "User " + name + " enroll Successfully";
     }
 
 
@@ -202,50 +256,64 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         String orgName = sampleOrg.getName();
         String msPid = sampleOrg.getMSPID();
         ca.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
-        HyperUser admin = new HyperUser(adminName, orgName);
-        admin.setEnrollment(ca.enroll(admin.getName(), adminPwd));
-        admin.setMspId(msPid);
 
-        sampleOrg.setAdmin(admin); // The admin of this org.
+        HFCAInfo info = ca.info(); //just check if we connect at all.
+        String infoName = info.getCAName();
+        logger.info("CAName: " + infoName);
+        if (infoName != null && !infoName.isEmpty()) {
+            //返回错误信息
 
+        }
+        FabricCaUser adminFabricCaUser = fabricCaUserService.selFabricCaUserByNameAndEnrollmentSecret(adminName,orgName,adminPwd);
 
-        // No need to enroll or register all done in End2endIt !
-        HyperUser user = new HyperUser(name, orgName);
+        if(adminFabricCaUser != null) {
 
-        //根据密码获取证书
-        user.setEnrollment(ca.enroll(user.getName(), password));
-        user.setMspId(msPid);
-//        HFCAAffiliation aff = ca.getHFCAAffiliations(user);
-//        Collection<HFCAIdentity> idlist = ca.getHFCAIdentities(user);
-//            user.setEnrollment(ca.reenroll(user));
+            HyperUser admin = fabricCaUserService.transferFabricCaUserToHyperUser(adminFabricCaUser);
+            if(!fabricCaUserService.isExpDate(adminFabricCaUser)) {
 
-        sampleOrg.addUser(user); // Remember user belongs to this Org
+                Enrollment enrollment = ca.reenroll(admin);
+                admin.setEnrollment(enrollment);
 
+                fabricCaUserService.updateFabricCaUserEnrollment(adminFabricCaUser,enrollment);
+            }
+            sampleOrg.setAdmin(admin); // The admin of this org.
+        }else{
+            throw new Exception( adminName + " User is Not exist");
+        }
+        FabricCaUser peerOrgAdminFabricCaUser = fabricCaUserService.selFabricCaUserByNameAndEnrollmentSecret(orgName + "Admin",orgName,"");
+        if( peerOrgAdminFabricCaUser != null) {
 
-        String sampleOrgName = sampleOrg.getName();
-        String sampleOrgDomainName = sampleOrg.getDomainName();
-        HyperUser peerOrgAdmin = new HyperUser(sampleOrgName + "Admin", orgName);
-        peerOrgAdmin.setMspId(msPid);
+            HyperUser peerOrgAdmin = fabricCaUserService.transferFabricCaUserToHyperUser(peerOrgAdminFabricCaUser);
+            if(!fabricCaUserService.isExpDate(peerOrgAdminFabricCaUser)) {
 
-        File certificateFile = Paths.get(config.getChannelPath(), "crypto-config/peerOrganizations/",
-                sampleOrgDomainName, format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem",
-                        sampleOrgDomainName, sampleOrgDomainName))
-                .toFile();
-        File privateKeyFile = ConnectionUtil.findFileSk(Paths.get(config.getChannelPath(),
-                "crypto-config/peerOrganizations/", sampleOrgDomainName,
-                format("/users/Admin@%s/msp/keystore", sampleOrgDomainName)).toFile());
+                Enrollment enrollment = ca.reenroll(peerOrgAdmin);
+                peerOrgAdmin.setEnrollment(enrollment);
 
-        String certificate = new String(IOUtils.toByteArray(new FileInputStream(certificateFile)), "UTF-8");
+                fabricCaUserService.updateFabricCaUserEnrollment(peerOrgAdminFabricCaUser,enrollment);
+            }
+            sampleOrg.setPeerAdmin(peerOrgAdmin);
+        }else{
+            throw new Exception( orgName + "Admin" + " User is Not exist");
+        }
+        FabricCaUser userFabricCaUser = fabricCaUserService.selFabricCaUserByNameAndEnrollmentSecret(name,orgName,password);
+        if(userFabricCaUser != null) {
+            HyperUser user = fabricCaUserService.transferFabricCaUserToHyperUser(userFabricCaUser);
+            if(!fabricCaUserService.isExpDate(userFabricCaUser)) {
 
-        PrivateKey privateKey = Utils.getPrivateKeyFromBytes(IOUtils.toByteArray(new FileInputStream(privateKeyFile)));
-        peerOrgAdmin.setEnrollment(new SampleStoreEnrollement(privateKey, certificate));
+                Enrollment enrollment = ca.reenroll(user);
+                user.setEnrollment(enrollment);
 
-        sampleOrg.setPeerAdmin(peerOrgAdmin);
+                fabricCaUserService.updateFabricCaUserEnrollment(userFabricCaUser,enrollment);
+            }
+            sampleOrg.addUser(user); // Remember user belongs to this Org
+        }else{
+            throw new Exception( name + " User is Not exist");
+        }
 
         return "Successfully loaded member from persistence";
     }
 
-    @Override
+
     public String constructChannel(String channelName, String peerWithOrg) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
@@ -324,7 +392,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
     }
 
 
-    @Override
+
     public String installChaincode(String name, String peerWithOrg, String channelName, String chaincodeName, String chainCodeVersion) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
@@ -377,7 +445,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
 
     }
 
-    @Override
+
     public String instantiateChaincode(String name, String peerWithOrg, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
@@ -467,7 +535,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         return result;
     }
 
-    @Override
+
     public String invokeChaincode(String name, String belongWithOrg, String[] peerWithOrgs, String channelName, String chaincodeName,
                                   String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
 
@@ -524,7 +592,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         // Check that all the proposals are consistent with each other. We should have only one set
         // where all the proposals above are consistent. Note the when sending to Orderer this is done automatically.
         //  Shown here as an example that applications can invoke and select.
-        // See org.hyperledger.fabric.sdk.proposal.consistency_validation config property.
+        // See org.hyperledger.mapper.sdk.proposal.consistency_validation config property.
         Collection<Set<ProposalResponse>> proposalConsistencySets = SDKUtils.getProposalConsistencySets(transactionPropResp);
         if (proposalConsistencySets.size() != 1) {
             logger.error(format("Expected only one set of consistent proposal responses but got " + proposalConsistencySets.size()));
@@ -584,7 +652,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         return result;
     }
 
-    @Override
+
     public String queryChaincode(String name, String peerWithOrg, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
@@ -624,7 +692,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         return "Caught an exception while quering chaincode";
     }
 
-    @Override
+
     public BlockInfo blockchainInfo(String name, String peerWithOrg, String channelName) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
@@ -638,13 +706,13 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         BlockchainInfo channelInfo = channel.queryBlockchainInfo();
         logger.info("Channel info for : " + channelName);
         logger.info("Channel height: " + channelInfo.getHeight());
-        String chainCurrentHash = Hex.encodeHexString(channelInfo.getCurrentBlockHash());
-        String chainPreviousHash = Hex.encodeHexString(channelInfo.getPreviousBlockHash());
+        String chainCurrentHash = Hex.toHexString(channelInfo.getCurrentBlockHash());
+        String chainPreviousHash = Hex.toHexString(channelInfo.getPreviousBlockHash());
         logger.info("Chain current block hash: " + chainCurrentHash);
         logger.info("Chain previous block hash: " + chainPreviousHash);
 
         BlockInfo returnedBlock = channel.queryBlockByNumber(channelInfo.getHeight() - 1);
-        String previousHash = Hex.encodeHexString(returnedBlock.getPreviousHash());
+        String previousHash = Hex.toHexString(returnedBlock.getPreviousHash());
         logger.info("queryBlockByNumber returned correct block with blockNumber " + returnedBlock.getBlockNumber()
                 + " \n previous_hash " + previousHash);
 
@@ -655,7 +723,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         return returnedBlock;
     }
 
-    @Override
+
     public String blockChainInfoByTxnId(String name, String peerWithOrg, String channelName,String txId) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
@@ -675,7 +743,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         return JSONObject.toJSONString(blockMap);
     }
 
-    @Override
+
     public String updateChaincode(String name, String peerWithOrg, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
@@ -871,7 +939,7 @@ public class ChainCodeServiceImpl implements ChainCodeService {
         }
     }
 
-    @Override
+
     public String joinChannel(String channelName, String peerWithOrg) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
