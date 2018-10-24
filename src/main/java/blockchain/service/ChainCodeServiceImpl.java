@@ -846,17 +846,15 @@ public class ChainCodeServiceImpl {
 
                 for (String peerName : sampleOrg.getPeerNames()) {
                     logger.debug(peerName);
+                    //将机构下面的背书peer加入
                     String peerLocation = sampleOrg.getPeerLocation(peerName);
                     Peer peer = client.newPeer(peerName, peerLocation, config.getPeerProperties(peerName));
 
-                    // Query the actual peer for which channels it belongs to and check
-                    // it belongs to this channel
                     try {
                         Set<String> channels = client.queryChannels(peer);
                         if (!channels.contains(channelName)) {
                             logger.info("Peer " + peerName + " does not appear to belong to channel " + channelName);
                         }
-
                         newChannel.addPeer(peer);
                     } catch (Exception e) {
                         e.printStackTrace();

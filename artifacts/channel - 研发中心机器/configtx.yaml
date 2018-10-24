@@ -46,7 +46,7 @@
       # in production but may be used as a template for other definitions
       - &OrdererOrg
           # DefaultOrg defines the organization which is used in the sampleconfig
-          # of the fabric.git development environment
+          # of the mapper.git development environment
           Name: OrdererOrg
   
           # ID to load the MSP definition as
@@ -57,7 +57,7 @@
   
       - &Org1
           # DefaultOrg defines the organization which is used in the sampleconfig
-          # of the fabric.git development environment
+          # of the mapper.git development environment
           Name: Org1MSP
   
           # ID to load the MSP definition as
@@ -74,7 +74,7 @@
   
       - &Org2
           # DefaultOrg defines the organization which is used in the sampleconfig
-          # of the fabric.git development environment
+          # of the mapper.git development environment
           Name: Org2MSP
   
           # ID to load the MSP definition as
