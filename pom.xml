@@ -8,22 +8,19 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.5.RELEASE</version>
+		<version>2.1.0.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
-		<grpc.version>1.13.2</grpc.version><!-- CURRENT_GRPC_VERSION -->
-		<protobuf.version>3.6.0</protobuf.version>
+		<grpc.version>1.16.1</grpc.version><!-- CURRENT_GRPC_VERSION -->
+		<protobuf.version>3.6.1</protobuf.version>
 		<bouncycastle.version>1.60</bouncycastle.version>
 		<httpclient.version>4.5.6</httpclient.version>
 		<skipITs>true</skipITs>
-		<alpn-boot-version>8.1.7.v20160121</alpn-boot-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<jacoco.version>0.7.9</jacoco.version>
-		<gpg.executable>gpg2</gpg.executable>
-		<mysql.version>8.0.12</mysql.version>
+		<mysql.version>8.0.13</mysql.version>
 	</properties>
 
 	<dependencies>
@@ -46,13 +43,13 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
-			<version>0.9.0</version>
+			<version>0.9.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20180130</version>
+			<version>20180813</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
@@ -81,12 +78,12 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-tcnative-boringssl-static</artifactId>
-			<version>2.0.10.Final</version>
+			<version>2.0.20.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec-http2</artifactId>
-			<version>4.1.26.Final</version>
+			<version>4.1.32.Final</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
 		<dependency>
@@ -172,7 +169,7 @@
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
-			<version>1.1.2</version>
+			<version>1.1.4</version>
 		</dependency>
 
 		<!--&lt;!&ndash; https://mvnrepository.com/artifact/org.mortbay.jetty.alpn/jetty-alpn-agent &ndash;&gt;-->
@@ -191,14 +188,14 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
-			<version>1.2.47</version>
+			<version>1.2.54</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
-			<version>1.21</version>
+			<version>1.23</version>
 		</dependency>
 
 		<dependency>
@@ -207,7 +204,10 @@
 			<version>1.2</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -255,7 +255,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.12</version>
+			<version>8.0.13</version>
 		</dependency>
 
 		<dependency>
@@ -267,12 +267,12 @@
 		<dependency>
 			<groupId>tk.mybatis</groupId>
 			<artifactId>mapper-spring-boot-starter</artifactId>
-			<version>2.0.3</version>
+			<version>2.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper-spring-boot-starter</artifactId>
-			<version>1.2.5</version>
+			<version>1.2.10</version>
 		</dependency>
 	</dependencies>
 
@@ -295,7 +295,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.1</version>
+				<version>3.8.0</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
