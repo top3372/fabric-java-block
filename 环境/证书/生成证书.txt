@@ -1,15 +1,15 @@
-/opt/hyperledger/fabric-release-1.1/scripts/bin/cryptogen generate --config=./crypto-config.yaml
+/data/wulb/blockchain/bc1/fabric/scripts/fabric-samples/bin/cryptogen generate --config=./crypto-config.yaml
 
-/opt/hyperledger/fabric-release-1.1/scripts/bin/configtxgen  -profile FiveOrgsOrdererGenesis -outputBlock ./channel-artifacts/genesis.block
+/data/wulb/blockchain/bc1/fabric/scripts/fabric-samples/bin/configtxgen  -profile FiveOrgsOrdererGenesis -outputBlock ./channel-artifacts/genesis.block
 
- /opt/hyperledger/fabric-release-1.1/scripts/bin/configtxgen  -profile FiveOrgsChannel -outputCreateChannelTx ./channel-artifacts/idealchannel.tx -channelID idealchannel
+ /data/wulb/blockchain/bc1/fabric/scripts/fabric-samples/bin/configtxgen  -profile FiveOrgsChannel -outputCreateChannelTx ./channel-artifacts/idealchannel.tx -channelID idealchannel
  
- /opt/hyperledger/fabric-release-1.1/scripts/bin/configtxgen  -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID idealchannel -asOrg Org1MSP
+ /data/wulb/blockchain/bc1/fabric/scripts/fabric-samples/bin/configtxgen  -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID idealchannel -asOrg Org1MSP
  
- /opt/hyperledger/fabric-release-1.1/scripts/bin/configtxgen -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID idealchannel -asOrg Org2MSP
+ /data/wulb/blockchain/bc1/fabric/scripts/fabric-samples/bin/configtxgen -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID idealchannel -asOrg Org2MSP
  
- /opt/hyperledger/fabric-release-1.1/scripts/bin/configtxgen  -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID idealchannel -asOrg Org3MSP
+ /data/wulb/blockchain/bc1/fabric/scripts/fabric-samples/bin/configtxgen  -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID idealchannel -asOrg Org3MSP
  
- /opt/hyperledger/fabric-release-1.1/scripts/bin/configtxgen -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org4MSPanchors.tx -channelID idealchannel -asOrg Org4MSP
+ /data/wulb/blockchain/bc1/fabric/scripts/fabric-samples/bin/configtxgen -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org4MSPanchors.tx -channelID idealchannel -asOrg Org4MSP
  
- /opt/hyperledger/fabric-release-1.1/scripts/bin/configtxgen -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org5MSPanchors.tx -channelID idealchannel -asOrg Org5MSP
+ /data/wulb/blockchain/bc1/fabric/scripts/fabric-samples/bin/configtxgen -profile FiveOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org5MSPanchors.tx -channelID idealchannel -asOrg Org5MSP

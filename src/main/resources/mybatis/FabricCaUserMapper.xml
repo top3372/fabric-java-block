@@ -38,9 +38,9 @@
       <if test=" name != null and name !='' ">
         AND name = #{name}
       </if>
-      <if test=" enrollmentSecret != null and enrollmentSecret !='' ">
+<!--      <if test=" enrollmentSecret != null and enrollmentSecret !='' ">
         AND enrollmentSecret = #{enrollmentSecret}
-      </if>
+      </if>-->
       <if test=" organization != null and organization !='' ">
         AND organization = #{organization}
       </if>

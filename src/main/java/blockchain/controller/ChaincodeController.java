@@ -29,9 +29,9 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(user.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(user.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter password in request body");
-            }
+//            if (StringUtils.isEmpty(user.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter password in request body");
+//            }
             if (StringUtils.isEmpty(user.getPeerWithOrg())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }
@@ -59,9 +59,9 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(channelDto.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(channelDto.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
-            }
+//            if (StringUtils.isEmpty(channelDto.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            }
             if (StringUtils.isEmpty(channelDto.getPeerWithOrg())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }
@@ -106,9 +106,9 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(chaincodeName.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(chaincodeName.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
-            }
+//            if (StringUtils.isEmpty(chaincodeName.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            }
             if (StringUtils.isEmpty(chaincodeName.getPeerWithOrg())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }
@@ -159,13 +159,16 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(chaincodeDto.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(chaincodeDto.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
-            }
+//            if (StringUtils.isEmpty(chaincodeDto.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            }
             if ((chaincodeDto.getFunction()) == null) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "function not present in method body");
             }
-            if (StringUtils.isEmpty(chaincodeDto.getPeerWithOrg())) {
+            if ((chaincodeDto.getPeerWithOrgs()) == null || chaincodeDto.getPeerWithOrgs().length == 0) {
+                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrgs in request body");
+            }
+            if (StringUtils.isEmpty(chaincodeDto.getBelongWithOrg())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }
             if (StringUtils.isEmpty(chaincodeDto.getChannelName())) {
@@ -182,9 +185,9 @@ public class ChaincodeController {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "args not present in method body");
             }
             String uname = chaincodeDto.getUserName();
-            String result = chainCodeService.loadUserFromPersistence(uname, chaincodeDto.getPassWord(), chaincodeDto.getPeerWithOrg());
+            String result = chainCodeService.loadUserFromPersistence(uname, chaincodeDto.getPassWord(), chaincodeDto.getBelongWithOrg());
             if (result == "Successfully loaded member from persistence") {
-                String response = chainCodeService.instantiateChaincode(uname, chaincodeDto.getPeerWithOrg(),
+                String response = chainCodeService.instantiateChaincode(uname, chaincodeDto.getBelongWithOrg(),chaincodeDto.getPeerWithOrgs(),
                         chaincodeDto.getChannelName(), chaincodeDto.getChainCodeName(), chaincodeDto.getFunction(),
                         chaincodeDto.getArgs(), chaincodeDto.getChainCodeVersion());
                 if (response == "Chaincode instantiated Successfully") {
@@ -215,10 +218,13 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(chaincodeDto.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(chaincodeDto.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            if (StringUtils.isEmpty(chaincodeDto.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            }
+            if ((chaincodeDto.getPeerWithOrgs()) == null || chaincodeDto.getPeerWithOrgs().length == 0) {
+                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrgs in request body");
             }
-            if (StringUtils.isEmpty(chaincodeDto.getPeerWithOrg())) {
+            if (StringUtils.isEmpty(chaincodeDto.getBelongWithOrg())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }
             if (StringUtils.isEmpty(chaincodeDto.getChannelName())) {
@@ -238,9 +244,9 @@ public class ChaincodeController {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "args not present in method body");
             }
             String uname = chaincodeDto.getUserName();
-            String result = chainCodeService.loadUserFromPersistence(uname, chaincodeDto.getPassWord(), chaincodeDto.getPeerWithOrg());
+            String result = chainCodeService.loadUserFromPersistence(uname, chaincodeDto.getPassWord(), chaincodeDto.getBelongWithOrg());
             if (result == "Successfully loaded member from persistence") {
-                String response = chainCodeService.updateChaincode(uname, chaincodeDto.getPeerWithOrg(),
+                String response = chainCodeService.updateChaincode(uname, chaincodeDto.getBelongWithOrg(),chaincodeDto.getPeerWithOrgs(),
                         chaincodeDto.getChannelName(), chaincodeDto.getChainCodeName(), chaincodeDto.getFunction(),
                         chaincodeDto.getArgs(), chaincodeDto.getChainCodeVersion()
                 );
@@ -272,9 +278,9 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(chaincodeDto.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(chaincodeDto.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
-            }
+//            if (StringUtils.isEmpty(chaincodeDto.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            }
             if ((chaincodeDto.getFunction()) == null) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "function not present in method body");
             }
@@ -328,9 +334,9 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(chaincodeDto.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(chaincodeDto.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
-            }
+//            if (StringUtils.isEmpty(chaincodeDto.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            }
             if (StringUtils.isEmpty(chaincodeDto.getPeerWithOrg())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }
@@ -379,9 +385,9 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(channelDto.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(channelDto.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
-            }
+//            if (StringUtils.isEmpty(channelDto.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            }
             if (StringUtils.isEmpty(channelDto.getPeerWithOrg())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }
@@ -418,9 +424,9 @@ public class ChaincodeController {
             if (StringUtils.isEmpty(blockDto.getUserName())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter username in reques body!");
             }
-            if (StringUtils.isEmpty(blockDto.getPassWord())) {
-                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
-            }
+//            if (StringUtils.isEmpty(blockDto.getPassWord())) {
+//                return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter passwords in request body");
+//            }
             if (StringUtils.isEmpty(blockDto.getPeerWithOrg())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter peerWithOrg in request body");
             }

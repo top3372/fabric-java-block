@@ -8,7 +8,7 @@ version: '2'
 services:
 
   zookeeper:
-    image: hyperledger/fabric-zookeeper:x86_64-0.4.6
+    image: hyperledger/fabric-zookeeper:0.4.13
     environment:
       #
       # server.x=[hostname]:nnnnn[:nnnnn]

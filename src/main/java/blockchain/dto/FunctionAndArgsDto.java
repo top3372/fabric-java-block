@@ -16,9 +16,17 @@ package blockchain.dto;
  * @author SWATI RAJ
  *
  */
-public class FunctionAndArgsDto extends ChaincodeNameDto{
+public class FunctionAndArgsDto extends BaseDto{
 
 
+	private String belongWithOrg;
+
+	private String[] peerWithOrgs ;
+
+	private String channelName;
+
+	private String chainCodeVersion;
+	private String chainCodeName;
 	private String function;
 	private String[] args;
 
@@ -37,4 +45,43 @@ public class FunctionAndArgsDto extends ChaincodeNameDto{
 		this.args = args;
 	}
 
+	public String getBelongWithOrg() {
+		return belongWithOrg;
+	}
+
+	public void setBelongWithOrg(String belongWithOrg) {
+		this.belongWithOrg = belongWithOrg;
+	}
+
+	public String[] getPeerWithOrgs() {
+		return peerWithOrgs;
+	}
+
+	public void setPeerWithOrgs(String[] peerWithOrgs) {
+		this.peerWithOrgs = peerWithOrgs;
+	}
+
+	public String getChannelName() {
+		return channelName;
+	}
+
+	public void setChannelName(String channelName) {
+		this.channelName = channelName;
+	}
+
+	public String getChainCodeVersion() {
+		return chainCodeVersion;
+	}
+
+	public void setChainCodeVersion(String chainCodeVersion) {
+		this.chainCodeVersion = chainCodeVersion;
+	}
+
+	public String getChainCodeName() {
+		return chainCodeName;
+	}
+
+	public void setChainCodeName(String chainCodeName) {
+		this.chainCodeName = chainCodeName;
+	}
 }

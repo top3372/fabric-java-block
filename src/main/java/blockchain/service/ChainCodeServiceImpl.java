@@ -5,14 +5,20 @@ import blockchain.config.Config;
 import blockchain.config.ConfigHelper;
 import blockchain.config.ConnectionUtil;
 import blockchain.dao.model.FabricCaUser;
-import blockchain.model.*;
+import blockchain.model.HyperUser;
+import blockchain.model.Org;
+import blockchain.model.SampleStoreEnrollement;
+import blockchain.model.Utils;
 import com.alibaba.fastjson.JSONObject;
-import org.bouncycastle.util.encoders.Hex;
 import org.apache.commons.io.IOUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.hyperledger.fabric.sdk.*;
+import org.hyperledger.fabric.sdk.TransactionRequest.Type;
 import org.hyperledger.fabric.sdk.exception.TransactionEventException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
-import org.hyperledger.fabric_ca.sdk.*;
+import org.hyperledger.fabric_ca.sdk.HFCAClient;
+import org.hyperledger.fabric_ca.sdk.HFCAInfo;
+import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.hyperledger.fabric_ca.sdk.exception.RegistrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,24 +27,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import org.hyperledger.fabric.sdk.TransactionRequest.Type;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hyperledger.fabric.sdk.Channel.NOfEvents.createNofEvents;
 import static org.hyperledger.fabric.sdk.Channel.PeerOptions.createPeerOptions;
-import static org.hyperledger.fabric.sdk.Channel.TransactionOptions.createTransactionOptions;
 
 
 @PropertySource("hyperledger.properties")
@@ -220,14 +220,14 @@ public class ChainCodeServiceImpl {
 
             RegistrationRequest rr = new RegistrationRequest(user.getName());
 //            rr.setMaxEnrollments(1);
-            rr.setSecret(password);
+            //rr.setSecret(password);
 
             try {
                 String secret = ca.register(rr, admin);
                 logger.info("****userName: " + user.getName() + ",password: " + password + ",secret: " + secret);
                 user.setEnrollmentSecret(secret);
 
-                Enrollment enrollment = ca.enroll(user.getName(), password);
+                Enrollment enrollment = ca.enroll(user.getName(), secret);
                 user.setEnrollment(enrollment);
                 user.setMspId(msPid);
 
@@ -446,14 +446,14 @@ public class ChainCodeServiceImpl {
     }
 
 
-    public String instantiateChaincode(String name, String peerWithOrg, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
+    public String instantiateChaincode(String name, String belongWithOrg, String[] peerWithOrgs, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
 
-        client.setUserContext(config.getSampleOrg(peerWithOrg).getPeerAdmin());
+        client.setUserContext(config.getSampleOrg(belongWithOrg).getPeerAdmin());
 
         ChaincodeID chaincodeID = getChaincodeId(chaincodeName, chainCodeVersion);
-        Channel channel = reconstructChannel(peerWithOrg, channelName, client);
+        Channel channel = reconstructChannel(peerWithOrgs, channelName, client);
 
         logger.info("Running channel " + channelName);
 
@@ -467,7 +467,7 @@ public class ChainCodeServiceImpl {
         instantiateProposalRequest.setFcn(chaincodeFunction);
         instantiateProposalRequest.setArgs(chaincodeArgs);
         instantiateProposalRequest.setChaincodeVersion(chainCodeVersion);
-        instantiateProposalRequest.setUserContext(config.getSampleOrg(peerWithOrg).getPeerAdmin());
+        instantiateProposalRequest.setUserContext(config.getSampleOrg(belongWithOrg).getPeerAdmin());
 
         Map<String, byte[]> tm = new HashMap<>();
         tm.put("HyperLedgerFabric", "InstantiateProposalRequest:JavaSDK".getBytes(UTF_8));
@@ -520,7 +520,7 @@ public class ChainCodeServiceImpl {
         if (!channel.getEventHubs().isEmpty()) {
             nOfEvents.addEventHubs(channel.getEventHubs());
         }
-        String result = channel.sendTransaction(successful, orderers,config.getSampleOrg(peerWithOrg).getPeerAdmin()).thenApply(transactionEvent -> {
+        String result = channel.sendTransaction(successful, orderers,config.getSampleOrg(belongWithOrg).getPeerAdmin()).thenApply(transactionEvent -> {
             waitOnFabric(0);
 //            BlockEvent blockEvent = transactionEvent.getBlockEvent();
 
@@ -682,6 +682,7 @@ public class ChainCodeServiceImpl {
                 logger.error("Failed query proposal from peer " + proposalResponse.getPeer().getName() + " status: " + proposalResponse.getStatus() +
                         ". Messages: " + proposalResponse.getMessage()
                         + ". Was verified : " + proposalResponse.isVerified());
+                throw new Exception(proposalResponse.getMessage());
             } else {
                 String payload = proposalResponse.getProposalResponse().getResponse().getPayload().toStringUtf8();
                 logger.info("Query payload of b from peer" + proposalResponse.getPeer().getName() + " returned " + payload);
@@ -744,12 +745,12 @@ public class ChainCodeServiceImpl {
     }
 
 
-    public String updateChaincode(String name, String peerWithOrg, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
+    public String updateChaincode(String name, String belongWithOrg, String[] peerWithOrgs, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
         HFClient client = HFClient.createNewInstance();
         checkConfig(client);
-        client.setUserContext(config.getSampleOrg(peerWithOrg).getPeerAdmin());
+        client.setUserContext(config.getSampleOrg(belongWithOrg).getPeerAdmin());
         ChaincodeID chaincodeID = getChaincodeId(chaincodeName, chainCodeVersion);
-        Channel channel = reconstructChannel(peerWithOrg, channelName, client);
+        Channel channel = reconstructChannel(peerWithOrgs, channelName, client);
 
         logger.info("Running channel " + channelName);
 
@@ -763,7 +764,7 @@ public class ChainCodeServiceImpl {
         upgradeProposalRequest.setFcn(chaincodeFunction);
         upgradeProposalRequest.setArgs(chaincodeArgs);
         upgradeProposalRequest.setChaincodeVersion(chainCodeVersion);
-        upgradeProposalRequest.setUserContext(config.getSampleOrg(peerWithOrg).getPeerAdmin());
+        upgradeProposalRequest.setUserContext(config.getSampleOrg(belongWithOrg).getPeerAdmin());
 
         Map<String, byte[]> tm = new HashMap<>();
         tm.put("HyperLedgerFabric", "UpgradeProposalRequest:JavaSDK".getBytes(UTF_8));
@@ -814,7 +815,7 @@ public class ChainCodeServiceImpl {
         if (!channel.getEventHubs().isEmpty()) {
             nOfEvents.addEventHubs(channel.getEventHubs());
         }
-        channel.sendTransaction(successful, orderers,config.getSampleOrg(peerWithOrg).getPeerAdmin()).thenApply(transactionEvent -> {
+        channel.sendTransaction(successful, orderers,config.getSampleOrg(belongWithOrg).getPeerAdmin()).thenApply(transactionEvent -> {
             waitOnFabric(0);
             BlockEvent blockEvent = transactionEvent.getBlockEvent();
             logger.info("Finished update transaction with transaction id " + transactionEvent.getTransactionID());

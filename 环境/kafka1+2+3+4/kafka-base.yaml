@@ -8,7 +8,7 @@ version: '2'
 services:
 
   kafka:
-    image: hyperledger/fabric-kafka:x86_64-0.4.6
+    image: hyperledger/fabric-kafka:0.4.13
     restart: always
     environment:
       # ========================================================================

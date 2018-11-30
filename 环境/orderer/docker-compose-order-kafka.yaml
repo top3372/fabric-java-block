@@ -1,0 +1,69 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+networks:
+  byfn:
+
+services:
+
+  orderer1.ideal.com:
+    container_name: orderer1.ideal.com
+    extends:
+      file: orderer-base.yaml
+      service: orderer-base
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/ideal.com/orderers/orderer1.ideal.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/ideal.com/orderers/orderer1.ideal.com/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 7050:7050
+    extra_hosts:
+      - "kafka1.ideal.com:10.190.11.72"
+      - "kafka2.ideal.com:10.190.11.72"
+      - "kafka3.ideal.com:10.190.11.72"
+      - "kafka4.ideal.com:10.190.11.72"
+    networks:
+      - byfn
+      
+  orderer2.ideal.com:
+    container_name: orderer2.ideal.com
+    extends:
+      file: orderer-base.yaml
+      service: orderer-base
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/ideal.com/orderers/orderer2.ideal.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/ideal.com/orderers/orderer2.ideal.com/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 8050:7050
+    extra_hosts:
+      - "kafka1.ideal.com:10.190.11.72"
+      - "kafka2.ideal.com:10.190.11.72"
+      - "kafka3.ideal.com:10.190.11.72"
+      - "kafka4.ideal.com:10.190.11.72"
+    networks:
+      - byfn
+      
+  orderer3.ideal.com:
+    container_name: orderer3.ideal.com
+    extends:
+      file: orderer-base.yaml
+      service: orderer-base
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/ideal.com/orderers/orderer3.ideal.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/ideal.com/orderers/orderer3.ideal.com/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 9050:7050
+    extra_hosts:
+      - "kafka1.ideal.com:10.190.11.72"
+      - "kafka2.ideal.com:10.190.11.72"
+      - "kafka3.ideal.com:10.190.11.72"
+      - "kafka4.ideal.com:10.190.11.72"
+    networks:
+      - byfn
+      
