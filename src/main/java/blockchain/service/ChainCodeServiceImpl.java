@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +34,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
@@ -72,6 +74,8 @@ public class ChainCodeServiceImpl {
 
 
     Type CHAIN_CODE_LANG = Type.GO_LANG;
+
+    private static Map<String,Channel> channelMap = new ConcurrentHashMap<>(100);
 
 
     /**
@@ -252,30 +256,30 @@ public class ChainCodeServiceImpl {
 
         Org sampleOrg = config.getSampleOrg(peerWithOrg);
 
-        HFCAClient ca = sampleOrg.getCAClient();
+//        HFCAClient ca = sampleOrg.getCAClient();
         String orgName = sampleOrg.getName();
         String msPid = sampleOrg.getMSPID();
-        ca.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
+//        ca.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
 
-        HFCAInfo info = ca.info(); //just check if we connect at all.
-        String infoName = info.getCAName();
-        logger.info("CAName: " + infoName);
-        if (infoName != null && !infoName.isEmpty()) {
-            //返回错误信息
-
-        }
+//        HFCAInfo info = ca.info(); //just check if we connect at all.
+//        String infoName = info.getCAName();
+//        logger.info("CAName: " + infoName);
+//        if (infoName != null && !infoName.isEmpty()) {
+//            //返回错误信息
+//
+//        }
         FabricCaUser adminFabricCaUser = fabricCaUserService.selFabricCaUserByNameAndEnrollmentSecret(adminName,orgName,adminPwd);
 
         if(adminFabricCaUser != null) {
 
             HyperUser admin = fabricCaUserService.transferFabricCaUserToHyperUser(adminFabricCaUser);
-            if(!fabricCaUserService.isExpDate(adminFabricCaUser)) {
-
-                Enrollment enrollment = ca.reenroll(admin);
-                admin.setEnrollment(enrollment);
-
-                fabricCaUserService.updateFabricCaUserEnrollment(adminFabricCaUser,enrollment);
-            }
+//            if(!fabricCaUserService.isExpDate(adminFabricCaUser)) {
+//
+//                Enrollment enrollment = ca.reenroll(admin);
+//                admin.setEnrollment(enrollment);
+//
+//                fabricCaUserService.updateFabricCaUserEnrollment(adminFabricCaUser,enrollment);
+//            }
             sampleOrg.setAdmin(admin); // The admin of this org.
         }else{
             throw new Exception( adminName + " User is Not exist");
@@ -284,13 +288,13 @@ public class ChainCodeServiceImpl {
         if( peerOrgAdminFabricCaUser != null) {
 
             HyperUser peerOrgAdmin = fabricCaUserService.transferFabricCaUserToHyperUser(peerOrgAdminFabricCaUser);
-            if(!fabricCaUserService.isExpDate(peerOrgAdminFabricCaUser)) {
-
-                Enrollment enrollment = ca.reenroll(peerOrgAdmin);
-                peerOrgAdmin.setEnrollment(enrollment);
-
-                fabricCaUserService.updateFabricCaUserEnrollment(peerOrgAdminFabricCaUser,enrollment);
-            }
+//            if(!fabricCaUserService.isExpDate(peerOrgAdminFabricCaUser)) {
+//
+//                Enrollment enrollment = ca.reenroll(peerOrgAdmin);
+//                peerOrgAdmin.setEnrollment(enrollment);
+//
+//                fabricCaUserService.updateFabricCaUserEnrollment(peerOrgAdminFabricCaUser,enrollment);
+//            }
             sampleOrg.setPeerAdmin(peerOrgAdmin);
         }else{
             throw new Exception( orgName + "Admin" + " User is Not exist");
@@ -298,13 +302,13 @@ public class ChainCodeServiceImpl {
         FabricCaUser userFabricCaUser = fabricCaUserService.selFabricCaUserByNameAndEnrollmentSecret(name,orgName,password);
         if(userFabricCaUser != null) {
             HyperUser user = fabricCaUserService.transferFabricCaUserToHyperUser(userFabricCaUser);
-            if(!fabricCaUserService.isExpDate(userFabricCaUser)) {
-
-                Enrollment enrollment = ca.reenroll(user);
-                user.setEnrollment(enrollment);
-
-                fabricCaUserService.updateFabricCaUserEnrollment(userFabricCaUser,enrollment);
-            }
+//            if(!fabricCaUserService.isExpDate(userFabricCaUser)) {
+//
+//                Enrollment enrollment = ca.reenroll(user);
+//                user.setEnrollment(enrollment);
+//
+//                fabricCaUserService.updateFabricCaUserEnrollment(userFabricCaUser,enrollment);
+//            }
             sampleOrg.addUser(user); // Remember user belongs to this Org
         }else{
             throw new Exception( name + " User is Not exist");
@@ -379,7 +383,7 @@ public class ChainCodeServiceImpl {
 //        }
 
         newChannel.initialize();
-
+        channelMap.put(channelName + peerWithOrg,newChannel);
         logger.info("Finished initialization channel " + channelName);
 
 
@@ -831,38 +835,40 @@ public class ChainCodeServiceImpl {
 
 
     public Channel reconstructChannel(String[] peerWithOrgs, String channelName, HFClient client) throws Exception {
-
+        peerWithOrgs = StringUtils.sortStringArray(peerWithOrgs);
         try {
 
-            Channel newChannel = client.newChannel(channelName);
-            for (String peerWithOrg : peerWithOrgs) {
-                loadOrderersAndPeers(client, peerWithOrg);
-                Org sampleOrg = config.getSampleOrg(peerWithOrg);
+            Channel newChannel = channelMap.get(channelName+JSONObject.toJSONString(peerWithOrgs));
+            if(newChannel == null) {
+                newChannel = client.newChannel(channelName);
+                for (String peerWithOrg : peerWithOrgs) {
+                    loadOrderersAndPeers(client, peerWithOrg);
+                    Org sampleOrg = config.getSampleOrg(peerWithOrg);
 
-                for (String orderName : sampleOrg.getOrdererNames()) {
+                    for (String orderName : sampleOrg.getOrdererNames()) {
 
-                    newChannel.addOrderer(client.newOrderer(orderName, sampleOrg.getOrdererLocation(orderName),
-                            config.getOrdererProperties(orderName)));
-                }
-
-                for (String peerName : sampleOrg.getPeerNames()) {
-                    logger.debug(peerName);
-                    //将机构下面的背书peer加入
-                    String peerLocation = sampleOrg.getPeerLocation(peerName);
-                    Peer peer = client.newPeer(peerName, peerLocation, config.getPeerProperties(peerName));
-
-                    try {
-                        Set<String> channels = client.queryChannels(peer);
-                        if (!channels.contains(channelName)) {
-                            logger.info("Peer " + peerName + " does not appear to belong to channel " + channelName);
-                        }
-                        newChannel.addPeer(peer);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error(e.getMessage());
-                        continue;
+                        newChannel.addOrderer(client.newOrderer(orderName, sampleOrg.getOrdererLocation(orderName),
+                                config.getOrdererProperties(orderName)));
                     }
-                }
+
+                    for (String peerName : sampleOrg.getPeerNames()) {
+                        logger.debug(peerName);
+                        //将机构下面的背书peer加入
+                        String peerLocation = sampleOrg.getPeerLocation(peerName);
+                        Peer peer = client.newPeer(peerName, peerLocation, config.getPeerProperties(peerName));
+
+                        try {
+                            Set<String> channels = client.queryChannels(peer);
+                            if (!channels.contains(channelName)) {
+                                logger.info("Peer " + peerName + " does not appear to belong to channel " + channelName);
+                            }
+                            newChannel.addPeer(peer);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            logger.error(e.getMessage());
+                            continue;
+                        }
+                    }
 
 //                for (String eventHubName : sampleOrg.getEventHubNames()) {
 //
@@ -871,10 +877,11 @@ public class ChainCodeServiceImpl {
 //                            eventHubProperties);
 //                    newChannel.addEventHub(eventHub);
 //                }
+                }
+
+                newChannel.initialize();
+                channelMap.put(channelName+JSONObject.toJSONString(peerWithOrgs),newChannel);
             }
-
-            newChannel.initialize();
-
             return newChannel;
         } catch (Exception e) {
             e.printStackTrace();
@@ -886,38 +893,39 @@ public class ChainCodeServiceImpl {
     public Channel reconstructChannel(String peerWithOrg, String channelName, HFClient client) throws Exception {
 
         try {
+            Channel newChannel = channelMap.get(channelName+peerWithOrg);
+            if(newChannel == null) {
+                newChannel = client.newChannel(channelName);
 
-            Channel newChannel = client.newChannel(channelName);
+                loadOrderersAndPeers(client, peerWithOrg);
+                Org sampleOrg = config.getSampleOrg(peerWithOrg);
 
-            loadOrderersAndPeers(client, peerWithOrg);
-            Org sampleOrg = config.getSampleOrg(peerWithOrg);
+                for (String orderName : sampleOrg.getOrdererNames()) {
 
-            for (String orderName : sampleOrg.getOrdererNames()) {
+                    newChannel.addOrderer(client.newOrderer(orderName, sampleOrg.getOrdererLocation(orderName),
+                            config.getOrdererProperties(orderName)));
+                }
 
-                newChannel.addOrderer(client.newOrderer(orderName, sampleOrg.getOrdererLocation(orderName),
-                        config.getOrdererProperties(orderName)));
-            }
+                for (String peerName : sampleOrg.getPeerNames()) {
+                    logger.debug(peerName);
+                    String peerLocation = sampleOrg.getPeerLocation(peerName);
+                    Peer peer = client.newPeer(peerName, peerLocation, config.getPeerProperties(peerName));
 
-            for (String peerName : sampleOrg.getPeerNames()) {
-                logger.debug(peerName);
-                String peerLocation = sampleOrg.getPeerLocation(peerName);
-                Peer peer = client.newPeer(peerName, peerLocation, config.getPeerProperties(peerName));
-
-                // Query the actual peer for which channels it belongs to and check
-                // it belongs to this channel
-                try {
-                    Set<String> channels = client.queryChannels(peer);
-                    if (!channels.contains(channelName)) {
-                        logger.info("Peer " + peerName + " does not appear to belong to channel " + channelName);
-                    }
+                    // Query the actual peer for which channels it belongs to and check
+                    // it belongs to this channel
+//                try {
+//                    Set<String> channels = client.queryChannels(peer);
+//                    if (!channels.contains(channelName)) {
+//                        logger.info("Peer " + peerName + " does not appear to belong to channel " + channelName);
+//                    }
 
                     newChannel.addPeer(peer);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error(e.getMessage());
-                    continue;
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    logger.error(e.getMessage());
+//                    continue;
+//                }
                 }
-            }
 
 //                for (String eventHubName : sampleOrg.getEventHubNames()) {
 //
@@ -928,8 +936,9 @@ public class ChainCodeServiceImpl {
 //                }
 
 
-            newChannel.initialize();
-
+                newChannel.initialize();
+                channelMap.put(channelName+peerWithOrg,newChannel);
+            }
             return newChannel;
         } catch (Exception e) {
             e.printStackTrace();
@@ -986,7 +995,7 @@ public class ChainCodeServiceImpl {
 
 
         newChannel.initialize();
-
+        channelMap.put(channelName + peerWithOrg,newChannel);
 
         logger.info("Finished joined channel" + channelName);
 

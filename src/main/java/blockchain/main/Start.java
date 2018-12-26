@@ -16,7 +16,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import blockchain.filter.JwtFilter;
 /**
  * 
  * @author SWATI RAJ
@@ -32,20 +31,6 @@ import blockchain.filter.JwtFilter;
 @SpringBootApplication
 @ComponentScan(basePackages={"blockchain"})
 public class Start {
-
-//	@Override
-//	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-//		return application.sources(Start.class);
-//	}
-
-//	@Bean
-//	public FilterRegistrationBean jwtFilter() {
-//		final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-//		registrationBean.setFilter(new JwtFilter());
-//		registrationBean.addUrlPatterns("/api/*");
-//
-//		return registrationBean;
-//	}
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(Start.class, args);
