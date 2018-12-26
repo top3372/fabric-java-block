@@ -83,3 +83,33 @@ PeerOrgs:
       Count: 4
     Users:
       Count: 1
+  # ---------------------------------------------------------------------------
+  # Org3: See "Org1" for full specification
+  # ---------------------------------------------------------------------------
+  - Name: Org3
+    Domain: org3.ideal.com
+    EnableNodeOUs: true
+    Template:
+      Count: 4
+    Users:
+      Count: 1
+  # ---------------------------------------------------------------------------
+  # Org4: See "Org1" for full specification
+  # ---------------------------------------------------------------------------
+  - Name: Org4
+    Domain: org4.ideal.com
+    EnableNodeOUs: true
+    Template:
+      Count: 4
+    Users:
+      Count: 1
+  # ---------------------------------------------------------------------------
+  # Org5: See "Org1" for full specification
+  # ---------------------------------------------------------------------------
+  - Name: Org5
+    Domain: org5.ideal.com
+    EnableNodeOUs: true
+    Template:
+      Count: 4
+    Users:
+      Count: 1
