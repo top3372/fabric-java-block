@@ -14,15 +14,15 @@ api说明
 
 | 接口	        | 链接           | 其他 |
 | ------------- |:-------------:| -----:|
-| 申请用户 | /enroll |  |
-| 创建通道 | /api/construct |  |
-| 安装合约 | /api/install |  |
-| 初始化合约 | /api/instantiate |  |
-| 更新合约 | /api/upgrade |  |
-| 加入通道 | /api/join |  |
-| invoke合约 | /api/invoke |  |
-| 查询合约 | /api/query |  |
-| 根据Tx_id查询交易所在区块高度信息 | /api/block/txid |  |
+| 申请用户 | /user/enroll |  |
+| 创建通道 | /channel/create |  |
+| 加入通道 | /channel/join |  |
+| 安装合约 | /chaincode/install |  |
+| 初始化合约 | /chaincode/instantiate |  |
+| 更新合约 | /chaincode/upgrade |  |
+| invoke合约 | /chaincode/invoke |  |
+| 查询合约 | /chaincode/query |  |
+| 根据Tx_id查询交易的BlockInfo | /blockInfo/withTxid |  |
 
 sdk工程目录下面artifacts\channel 包含了 证书信息等
               artifacts\src\github.com 目录下面 包含了3个智能合约,可以供大家测试
