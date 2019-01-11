@@ -16,23 +16,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-/**
- * 
- * @author SWATI RAJ
- *
- */
-
 
 /**
- * 
- * class for starting the spring boot application
- *
+ * @author LeonMa
  */
 @SpringBootApplication
-public class Start {
+public class FabricSdkApiStart {
 
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(Start.class, args);
+	public static void main(String[] args) {
+		SpringApplication.run(FabricSdkApiStart.class, args);
 	}
 
 }

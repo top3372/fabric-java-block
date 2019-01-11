@@ -300,7 +300,7 @@ public class ChainCodeService {
     }
 
 
-    public String queryChaincode(String name, String peerWithOrg, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
+    public String queryChainCode(String name, String peerWithOrg, String channelName, String chaincodeName, String chaincodeFunction, String[] chaincodeArgs, String chainCodeVersion) throws Exception {
         HFClient client = HFClient.createNewInstance();
         hyperledgerConfiguration.checkConfig(client);
         client.setUserContext(HyperledgerConfiguration.config.getSampleOrg(peerWithOrg).getPeerAdmin());

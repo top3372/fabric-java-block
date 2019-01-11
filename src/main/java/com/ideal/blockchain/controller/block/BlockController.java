@@ -1,11 +1,13 @@
 package com.ideal.blockchain.controller.block;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ideal.blockchain.dto.request.BlockDto;
 import com.ideal.blockchain.dto.response.ResultInfo;
 import com.ideal.blockchain.enums.ResponseCodeEnum;
 import com.ideal.blockchain.service.block.BlockService;
 import com.ideal.blockchain.service.block.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.hyperledger.fabric.sdk.BlockInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -44,14 +46,13 @@ public class BlockController {
             if (StringUtils.isEmpty(blockDto.getTxId())) {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "please enter txId in request body");
             }
-            String uname = blockDto.getUserName();
-            log.debug(uname);
+            log.debug(blockDto.getUserName());
 
-            String result = userService.loadUserFromPersistence(uname, blockDto.getPassWord(), blockDto.getPeerWithOrg());
+            String result = userService.loadUserFromPersistence(blockDto.getUserName(), blockDto.getPassWord(), blockDto.getPeerWithOrg());
             if (result == "Successfully loaded member from persistence") {
-                String response = blockService.blockChainInfoByTxnId(blockDto.getUserName(),blockDto.getPeerWithOrg(),blockDto.getChannelName(),blockDto.getTxId());
+                BlockInfo blockInfo = blockService.blockChainInfoByTxnId(blockDto.getUserName(),blockDto.getPeerWithOrg(),blockDto.getChannelName(),blockDto.getTxId());
 
-                return new ResultInfo(ResponseCodeEnum.SUCCESS, response);
+                return new ResultInfo(ResponseCodeEnum.SUCCESS, JSONObject.toJSONString(blockInfo));
 
             } else {
                 return new ResultInfo(ResponseCodeEnum.FAILURE, "Something went wrong");

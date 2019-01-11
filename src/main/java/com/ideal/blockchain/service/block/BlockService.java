@@ -5,10 +5,7 @@ import com.ideal.blockchain.config.HyperledgerConfiguration;
 import com.ideal.blockchain.model.Org;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
-import org.hyperledger.fabric.sdk.BlockInfo;
-import org.hyperledger.fabric.sdk.BlockchainInfo;
-import org.hyperledger.fabric.sdk.Channel;
-import org.hyperledger.fabric.sdk.HFClient;
+import org.hyperledger.fabric.sdk.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,19 +32,19 @@ public class BlockService {
 
         Org sampleOrg = HyperledgerConfiguration.config.getSampleOrg(peerWithOrg);
         client.setUserContext(sampleOrg.getUser(name));
-        //Set<Peer> peerSet = sampleOrg.getPeers();
 
         Channel channel = channelService.reconstructChannel(peerWithOrg, channelName, client);
 
-        BlockchainInfo channelInfo = channel.queryBlockchainInfo();
+        BlockchainInfo blockchainInfo = channel.queryBlockchainInfo();
+
         log.info("Channel info for : " + channelName);
-        log.info("Channel height: " + channelInfo.getHeight());
-        String chainCurrentHash = Hex.toHexString(channelInfo.getCurrentBlockHash());
-        String chainPreviousHash = Hex.toHexString(channelInfo.getPreviousBlockHash());
+        log.info("Channel height: " + blockchainInfo.getHeight());
+        String chainCurrentHash = Hex.toHexString(blockchainInfo.getCurrentBlockHash());
+        String chainPreviousHash = Hex.toHexString(blockchainInfo.getPreviousBlockHash());
         log.info("Chain current block hash: " + chainCurrentHash);
         log.info("Chain previous block hash: " + chainPreviousHash);
 
-        BlockInfo returnedBlock = channel.queryBlockByNumber(channelInfo.getHeight() - 1);
+        BlockInfo returnedBlock = channel.queryBlockByNumber(blockchainInfo.getHeight() - 1);
         String previousHash = Hex.toHexString(returnedBlock.getPreviousHash());
         log.info("queryBlockByNumber returned correct block with blockNumber " + returnedBlock.getBlockNumber()
                 + " \n previous_hash " + previousHash);
@@ -59,8 +56,7 @@ public class BlockService {
         return returnedBlock;
     }
 
-
-    public String blockChainInfoByTxnId(String name, String peerWithOrg, String channelName,String txId) throws Exception {
+    public TransactionInfo blockchainInfo(String name, String peerWithOrg, String channelName,String txId) throws Exception {
         HFClient client = HFClient.createNewInstance();
         hyperledgerConfiguration.checkConfig(client);
 
@@ -69,14 +65,25 @@ public class BlockService {
 
         Channel channel = channelService.reconstructChannel(peerWithOrg, channelName, client);
 
-        Map<String,Object> blockMap = new HashMap<>();
+        TransactionInfo transactionInfo = channel.queryTransactionByID(txId);
+
+        return transactionInfo;
+    }
+
+
+    public BlockInfo blockChainInfoByTxnId(String name, String peerWithOrg, String channelName,String txId) throws Exception {
+        HFClient client = HFClient.createNewInstance();
+        hyperledgerConfiguration.checkConfig(client);
+
+        Org sampleOrg = HyperledgerConfiguration.config.getSampleOrg(peerWithOrg);
+        client.setUserContext(sampleOrg.getUser(name));
+
+        Channel channel = channelService.reconstructChannel(peerWithOrg, channelName, client);
+
+
         BlockInfo blockInfo = channel.queryBlockByTransactionID(txId);
-        blockMap.put("blockNumber",blockInfo.getBlockNumber());
-        blockMap.put("dataHash", blockInfo.getDataHash());
-        blockMap.put("previousHash",blockInfo.getPreviousHash());
 
-
-        return JSONObject.toJSONString(blockMap);
+        return blockInfo;
     }
 
 }
