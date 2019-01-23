@@ -289,7 +289,7 @@ public class ChainCodeController {
 
             String result = userService.loadUserFromPersistence(uname, chaincodeDto.getPassWord(), chaincodeDto.getPeerWithOrg());
             if (result == "Successfully loaded member from persistence") {
-                String response = chainCodeService.queryChaincode(uname, chaincodeDto.getPeerWithOrg(), chaincodeDto.getChannelName(),
+                String response = chainCodeService.queryChainCode(uname, chaincodeDto.getPeerWithOrg(), chaincodeDto.getChannelName(),
                         chaincodeDto.getChainCodeName(), chaincodeDto.getFunction(), chaincodeDto.getArgs(), chaincodeDto.getChainCodeVersion());
                 if (response != "Caught an exception while quering chaincode") {
                     return new ResultInfo(ResponseCodeEnum.SUCCESS, response);
