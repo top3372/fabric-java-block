@@ -1,6 +1,7 @@
 package com.ideal.blockchain.controller.block;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ideal.blockchain.config.ChannelContext;
 import com.ideal.blockchain.dto.request.BlockDto;
 import com.ideal.blockchain.dto.response.ResultInfo;
 import com.ideal.blockchain.enums.ResponseCodeEnum;
@@ -62,6 +63,8 @@ public class BlockController {
             e.printStackTrace();
             log.error(e.getMessage());
             return new ResultInfo(ResponseCodeEnum.FAILURE, e.getMessage());
+        }finally {
+            ChannelContext.clear();
         }
     }
 }

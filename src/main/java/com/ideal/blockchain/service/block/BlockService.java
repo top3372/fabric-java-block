@@ -1,6 +1,7 @@
 package com.ideal.blockchain.service.block;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ideal.blockchain.config.ChannelContext;
 import com.ideal.blockchain.config.HyperledgerConfiguration;
 import com.ideal.blockchain.model.Org;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +33,8 @@ public class BlockService {
 
         Org sampleOrg = HyperledgerConfiguration.config.getSampleOrg(peerWithOrg);
         client.setUserContext(sampleOrg.getUser(name));
-
-        Channel channel = channelService.reconstructChannel(peerWithOrg, channelName, client);
+        channelService.reconstructChannel(peerWithOrg, channelName, client);
+        Channel channel = ChannelContext.get();
 
         BlockchainInfo blockchainInfo = channel.queryBlockchainInfo();
 
@@ -62,8 +63,8 @@ public class BlockService {
 
         Org sampleOrg = HyperledgerConfiguration.config.getSampleOrg(peerWithOrg);
         client.setUserContext(sampleOrg.getUser(name));
-
-        Channel channel = channelService.reconstructChannel(peerWithOrg, channelName, client);
+        channelService.reconstructChannel(peerWithOrg, channelName, client);
+        Channel channel = ChannelContext.get();
 
         TransactionInfo transactionInfo = channel.queryTransactionByID(txId);
 
@@ -77,8 +78,8 @@ public class BlockService {
 
         Org sampleOrg = HyperledgerConfiguration.config.getSampleOrg(peerWithOrg);
         client.setUserContext(sampleOrg.getUser(name));
-
-        Channel channel = channelService.reconstructChannel(peerWithOrg, channelName, client);
+        channelService.reconstructChannel(peerWithOrg, channelName, client);
+        Channel channel =  ChannelContext.get();
 
 
         BlockInfo blockInfo = channel.queryBlockByTransactionID(txId);

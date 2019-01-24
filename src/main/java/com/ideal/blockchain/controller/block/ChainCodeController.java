@@ -1,5 +1,6 @@
 package com.ideal.blockchain.controller.block;
 
+import com.ideal.blockchain.config.ChannelContext;
 import com.ideal.blockchain.dto.request.ChaincodeNameDto;
 import com.ideal.blockchain.dto.request.FunctionAndArgsDto;
 import com.ideal.blockchain.dto.request.InvokeChainCodeArgsDto;
@@ -131,6 +132,8 @@ public class ChainCodeController {
             e.printStackTrace();
             log.error(e.getMessage());
             return new ResultInfo(ResponseCodeEnum.FAILURE, e.getMessage());
+        }finally {
+            ChannelContext.clear();
         }
     }
 
@@ -191,6 +194,8 @@ public class ChainCodeController {
             e.printStackTrace();
             log.error(e.getMessage());
             return new ResultInfo(ResponseCodeEnum.FAILURE, e.getMessage());
+        }finally {
+            ChannelContext.clear();
         }
     }
 
@@ -250,6 +255,8 @@ public class ChainCodeController {
             e.printStackTrace();
             log.error(e.getMessage());
             return new ResultInfo(ResponseCodeEnum.FAILURE, e.getMessage());
+        }finally {
+            ChannelContext.clear();
         }
     }
 
@@ -304,6 +311,8 @@ public class ChainCodeController {
             e.printStackTrace();
             log.error(e.getMessage());
             return new ResultInfo(ResponseCodeEnum.FAILURE, e.getMessage());
+        }finally {
+            ChannelContext.clear();
         }
     }
 }

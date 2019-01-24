@@ -1,5 +1,6 @@
 package com.ideal.blockchain.service.block;
 
+import com.ideal.blockchain.config.ChannelContext;
 import com.ideal.blockchain.config.HyperledgerConfiguration;
 import com.ideal.blockchain.model.Org;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +101,8 @@ public class ChainCodeService {
         client.setUserContext(HyperledgerConfiguration.config.getSampleOrg(belongWithOrg).getPeerAdmin());
 
         ChaincodeID chaincodeID = hyperledgerConfiguration.getChaincodeId(chaincodeName, chainCodeVersion);
-        Channel channel = channelService.reconstructChannel(peerWithOrgs, channelName, client);
+        channelService.reconstructChannel(peerWithOrgs, channelName, client);
+        Channel channel = ChannelContext.get();
 
         log.info("Running channel " + channelName);
 
@@ -192,7 +194,8 @@ public class ChainCodeService {
         client.setUserContext(HyperledgerConfiguration.config.getSampleOrg(belongWithOrg).getPeerAdmin());
 
         ChaincodeID chaincodeID = hyperledgerConfiguration.getChaincodeId(chaincodeName, chainCodeVersion);
-        Channel channel = channelService.reconstructChannel(peerWithOrgs, channelName, client);
+        channelService.reconstructChannel(peerWithOrgs, channelName, client);
+        Channel channel = ChannelContext.get();
 
         log.info("Running channel " + channelName);
 
@@ -306,7 +309,8 @@ public class ChainCodeService {
         client.setUserContext(HyperledgerConfiguration.config.getSampleOrg(peerWithOrg).getPeerAdmin());
 
         ChaincodeID chaincodeID = hyperledgerConfiguration.getChaincodeId(chaincodeName, chainCodeVersion);
-        Channel channel = channelService.reconstructChannel(peerWithOrg, channelName, client);
+        channelService.reconstructChannel(peerWithOrg, channelName, client);
+        Channel channel = ChannelContext.get();
 
         log.info("Running channel " + channelName);
         QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
@@ -346,7 +350,9 @@ public class ChainCodeService {
         hyperledgerConfiguration.checkConfig(client);
         client.setUserContext(HyperledgerConfiguration.config.getSampleOrg(belongWithOrg).getPeerAdmin());
         ChaincodeID chaincodeID = hyperledgerConfiguration.getChaincodeId(chaincodeName, chainCodeVersion);
-        Channel channel = channelService.reconstructChannel(peerWithOrgs, channelName, client);
+        channelService.reconstructChannel(peerWithOrgs, channelName, client);
+        Channel channel = ChannelContext.get();
+
 
         log.info("Running channel " + channelName);
 

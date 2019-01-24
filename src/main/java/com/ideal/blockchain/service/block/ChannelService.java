@@ -1,6 +1,7 @@
 package com.ideal.blockchain.service.block;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ideal.blockchain.config.ChannelContext;
 import com.ideal.blockchain.config.Config;
 import com.ideal.blockchain.config.HyperledgerConfiguration;
 import com.ideal.blockchain.model.Org;
@@ -101,7 +102,7 @@ public class ChannelService {
 
 
 
-    public Channel reconstructChannel(String[] peerWithOrgs, String channelName, HFClient client) throws Exception {
+    public void reconstructChannel(String[] peerWithOrgs, String channelName, HFClient client) throws Exception {
         peerWithOrgs = StringUtils.sortStringArray(peerWithOrgs);
         try {
 
@@ -148,16 +149,17 @@ public class ChannelService {
 
                 newChannel.initialize();
                 Config.channelMap.put(channelName+JSONObject.toJSONString(peerWithOrgs),newChannel);
+                ChannelContext.set(newChannel);
+            }else{
+                ChannelContext.set(newChannel);
             }
-            return newChannel;
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
-            return null;
         }
     }
 
-    public Channel reconstructChannel(String peerWithOrg, String channelName, HFClient client) throws Exception {
+    public void reconstructChannel(String peerWithOrg, String channelName, HFClient client) throws Exception {
 
         try {
             Channel newChannel = Config.channelMap.get(channelName+peerWithOrg);
@@ -205,12 +207,13 @@ public class ChannelService {
 
                 newChannel.initialize();
                 Config.channelMap.put(channelName+peerWithOrg,newChannel);
+                ChannelContext.set(newChannel);
+            }else{
+                ChannelContext.set(newChannel);
             }
-            return newChannel;
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
-            return null;
         }
     }
 
