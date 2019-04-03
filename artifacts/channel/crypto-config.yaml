@@ -11,14 +11,12 @@ OrdererOrgs:
   # Orderer
   # ---------------------------------------------------------------------------
   - Name: Orderer
-    Domain: ideal.com
+    Domain: example.com
     # ---------------------------------------------------------------------------
     # "Specs" - See PeerOrgs below for complete description
     # ---------------------------------------------------------------------------
     Specs:
-      - Hostname: orderer1
-      - Hostname: orderer2
-      - Hostname: orderer3
+      - Hostname: orderer
 # ---------------------------------------------------------------------------
 # "PeerOrgs" - Definition of organizations managing peer nodes
 # ---------------------------------------------------------------------------
@@ -27,7 +25,7 @@ PeerOrgs:
   # Org1
   # ---------------------------------------------------------------------------
   - Name: Org1
-    Domain: org1.ideal.com
+    Domain: org1.example.com
     EnableNodeOUs: true
     # ---------------------------------------------------------------------------
     # "Specs"
@@ -63,7 +61,7 @@ PeerOrgs:
     # name collisions
     # ---------------------------------------------------------------------------
     Template:
-      Count: 4
+      Count: 1
       # Start: 5
       # Hostname: {{.Prefix}}{{.Index}} # default
     # ---------------------------------------------------------------------------
@@ -71,45 +69,5 @@ PeerOrgs:
     # ---------------------------------------------------------------------------
     # Count: The number of user accounts _in addition_ to Admin
     # ---------------------------------------------------------------------------
-    Users:
-      Count: 1
-  # ---------------------------------------------------------------------------
-  # Org2: See "Org1" for full specification
-  # ---------------------------------------------------------------------------
-  - Name: Org2
-    Domain: org2.ideal.com
-    EnableNodeOUs: true
-    Template:
-      Count: 4
-    Users:
-      Count: 1
-  # ---------------------------------------------------------------------------
-  # Org3: See "Org1" for full specification
-  # ---------------------------------------------------------------------------
-  - Name: Org3
-    Domain: org3.ideal.com
-    EnableNodeOUs: true
-    Template:
-      Count: 4
-    Users:
-      Count: 1
-  # ---------------------------------------------------------------------------
-  # Org4: See "Org1" for full specification
-  # ---------------------------------------------------------------------------
-  - Name: Org4
-    Domain: org4.ideal.com
-    EnableNodeOUs: true
-    Template:
-      Count: 4
-    Users:
-      Count: 1
-  # ---------------------------------------------------------------------------
-  # Org5: See "Org1" for full specification
-  # ---------------------------------------------------------------------------
-  - Name: Org5
-    Domain: org5.ideal.com
-    EnableNodeOUs: true
-    Template:
-      Count: 4
     Users:
       Count: 1

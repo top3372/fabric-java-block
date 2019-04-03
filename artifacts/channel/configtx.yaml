@@ -25,7 +25,7 @@ Organizations:
         ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
-        MSPDir: crypto-config/ordererOrganizations/ideal.com/msp
+        MSPDir: crypto-config/ordererOrganizations/example.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -40,7 +40,6 @@ Organizations:
             Admins:
                 Type: Signature
                 Rule: "OR('OrdererMSP.admin')"
-
     - &Org1
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
@@ -49,8 +48,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org1MSP
 
-        MSPDir: crypto-config/peerOrganizations/org1.ideal.com/msp
-
+        MSPDir: crypto-config/peerOrganizations/org1.example.com/msp
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
         #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
@@ -69,130 +67,7 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.org1.ideal.com
-              Port: 7051
-
-    - &Org2
-        # DefaultOrg defines the organization which is used in the sampleconfig
-        # of the fabric.git development environment
-        Name: Org2MSP
-
-        # ID to load the MSP definition as
-        ID: Org2MSP
-
-        MSPDir: crypto-config/peerOrganizations/org2.ideal.com/msp
-
-        # Policies defines the set of policies at this level of the config tree
-        # For organization policies, their canonical path is usually
-        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
-        Policies:
-            Readers:
-                Type: Signature
-                Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
-            Writers:
-                Type: Signature
-                Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
-            Admins:
-                Type: Signature
-                Rule: "OR('Org2MSP.admin')"
-
-        AnchorPeers:
-            # AnchorPeers defines the location of peers which can be used
-            # for cross org gossip communication.  Note, this value is only
-            # encoded in the genesis block in the Application section context
-            - Host: peer0.org2.ideal.com
-              Port: 7051
-
-    - &Org3
-        # Name of the organization
-        Name: Org3MSP
-
-        # ID to load the MSP definition as
-        ID: Org3MSP
-
-        MSPDir: crypto-config/peerOrganizations/org3.ideal.com/msp
-
-        # Policies defines the set of policies at this level of the config tree
-        # For organization policies, their canonical path is usually
-        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
-        Policies:
-            Readers:
-                Type: Signature
-                Rule: "OR('Org3MSP.admin', 'Org3MSP.peer', 'Org3MSP.client')"
-            Writers:
-                Type: Signature
-                Rule: "OR('Org3MSP.admin', 'Org3MSP.client')"
-            Admins:
-                Type: Signature
-                Rule: "OR('Org3MSP.admin')"
-
-        AnchorPeers:
-            # AnchorPeers defines the location of peers which can be used
-            # for cross org gossip communication.  Note, this value is only
-            # encoded in the genesis block in the Application section context
-            - Host: peer0.org3.ideal.com
-              Port: 7051
-             
-    - &Org4
-        # Name of the organization
-        Name: Org4MSP
-
-        # ID to load the MSP definition as
-        ID: Org4MSP
-
-
-        MSPDir: crypto-config/peerOrganizations/org4.ideal.com/msp
-
-        # Policies defines the set of policies at this level of the config tree
-        # For organization policies, their canonical path is usually
-        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
-        Policies:
-            Readers:
-                Type: Signature
-                Rule: "OR('Org4MSP.admin', 'Org4MSP.peer', 'Org4MSP.client')"
-            Writers:
-                Type: Signature
-                Rule: "OR('Org4MSP.admin', 'Org4MSP.client')"
-            Admins:
-                Type: Signature
-                Rule: "OR('Org4MSP.admin')"
-
-        AnchorPeers:
-            # AnchorPeers defines the location of peers which can be used
-            # for cross org gossip communication.  Note, this value is only
-            # encoded in the genesis block in the Application section context
-            - Host: peer0.org4.ideal.com
-              Port: 7051
-              
-    - &Org5
-        # Name of the organization
-        Name: Org5MSP
-
-        # ID to load the MSP definition as
-        ID: Org5MSP
-
-
-        MSPDir: crypto-config/peerOrganizations/org5.ideal.com/msp
-
-        # Policies defines the set of policies at this level of the config tree
-        # For organization policies, their canonical path is usually
-        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
-        Policies:
-            Readers:
-                Type: Signature
-                Rule: "OR('Org5MSP.admin', 'Org5MSP.peer', 'Org5MSP.client')"
-            Writers:
-                Type: Signature
-                Rule: "OR('Org5MSP.admin', 'Org5MSP.client')"
-            Admins:
-                Type: Signature
-                Rule: "OR('Org5MSP.admin')"
-
-        AnchorPeers:
-            # AnchorPeers defines the location of peers which can be used
-            # for cross org gossip communication.  Note, this value is only
-            # encoded in the genesis block in the Application section context
-            - Host: peer0.org5.ideal.com
+            - Host: peer0.org1.example.com
               Port: 7051
 ################################################################################
 #
@@ -242,7 +117,6 @@ Capabilities:
         # modification of which would cause incompatibilities.  Users should
         # leave this flag set to true.
         V1_2: true
-
 ################################################################################
 #
 #   SECTION: Application
@@ -256,7 +130,7 @@ Application: &ApplicationDefaults
     # Organizations is the list of orgs which are defined as participants on
     # the application side of the network
     Organizations:
-
+    
     # Policies defines the set of policies at this level of the config tree
     # For Application policies, their canonical path is
     #   /Channel/Application/<PolicyName>
@@ -276,7 +150,6 @@ Application: &ApplicationDefaults
     # description
     Capabilities:
         <<: *ApplicationCapabilities
-
 ################################################################################
 #
 #   SECTION: Orderer
@@ -289,12 +162,10 @@ Orderer: &OrdererDefaults
 
     # Orderer Type: The orderer implementation to start
     # Available types are "solo" and "kafka"
-    OrdererType: kafka
+    OrdererType: solo
 
     Addresses:
-        - orderer1.ideal.com:7050
-        - orderer2.ideal.com:8050
-        - orderer3.ideal.com:9050
+        - orderer.example.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
@@ -307,7 +178,7 @@ Orderer: &OrdererDefaults
 
         # Absolute Max Bytes: The absolute maximum number of bytes allowed for
         # the serialized messages in a batch.
-        AbsoluteMaxBytes: 98 MB
+        AbsoluteMaxBytes: 99 MB
 
         # Preferred Max Bytes: The preferred maximum number of bytes allowed for
         # the serialized messages in a batch. A message larger than the preferred
@@ -315,19 +186,15 @@ Orderer: &OrdererDefaults
         PreferredMaxBytes: 512 KB
 
     Kafka:
-        # Brokers: A list of Kafka brokers to which the orderer connects. Edit
-        # this list to identify the brokers of the ordering service.
-        # NOTE: Use IP:port notation.
+        # Brokers: A list of Kafka brokers to which the orderer connects
+        # NOTE: Use IP:port notation
         Brokers:
-            - kafka1.ideal.com:9092
-            - kafka2.ideal.com:8092
-            - kafka3.ideal.com:7092
-            - kafka4.ideal.com:6092
+            - 127.0.0.1:9092
 
     # Organizations is the list of orgs which are defined as participants on
     # the orderer side of the network
     Organizations:
-
+    
     # Policies defines the set of policies at this level of the config tree
     # For Orderer policies, their canonical path is
     #   /Channel/Orderer/<PolicyName>
@@ -396,7 +263,7 @@ Channel: &ChannelDefaults
 ################################################################################
 Profiles:
 
-    FiveOrgsOrdererGenesis:
+    OneOrgOrdererGenesis:
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
@@ -406,17 +273,10 @@ Profiles:
             SampleConsortium:
                 Organizations:
                     - *Org1
-                    - *Org2
-                    - *Org3
-                    - *Org4
-                    - *Org5
-    FiveOrgsChannel:
+    OneOrgChannel:
         Consortium: SampleConsortium
         Application:
             <<: *ApplicationDefaults
             Organizations:
                 - *Org1
-                - *Org2
-                - *Org3
-                - *Org4
-                - *Org5
+
