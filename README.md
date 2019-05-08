@@ -7,7 +7,7 @@
 
 用swagger 生成api文档
 
-基于Hyperledger Fabric v1.3.0版本...
+基于Hyperledger Fabric v1.4.0版本...
 
 环境中包含 3个zookeeper 4个kafaka 3个orderer 5个机构下面个4个节点 的分布式部署 (其中IP地址需要根据环境修改)  
 
