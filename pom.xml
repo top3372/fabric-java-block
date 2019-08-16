@@ -13,10 +13,10 @@
 	</parent>
 
 	<properties>
-		<grpc.version>1.17.1</grpc.version><!-- CURRENT_GRPC_VERSION -->
-		<protobuf.version>3.6.1</protobuf.version>
-		<bouncycastle.version>1.60</bouncycastle.version>
-		<httpclient.version>4.5.6</httpclient.version>
+		<grpc.version>1.23.0</grpc.version><!-- CURRENT_GRPC_VERSION -->
+		<protobuf.version>3.9.1</protobuf.version>
+		<bouncycastle.version>1.62</bouncycastle.version>
+		<httpclient.version>4.5.9</httpclient.version>
 		<skipITs>true</skipITs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20180813</version>
+			<version>20190722</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
