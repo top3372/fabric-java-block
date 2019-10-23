@@ -270,33 +270,53 @@ public class ChainCodeService {
         ////////////////////////////
         // Send Transaction Transaction to orderer
         log.info("Sending chaincode transaction " + chaincodeName + "_" + chaincodeFunction + " to orderer.");
-        String result = channel.sendTransaction(successful,HyperledgerConfiguration.config.getSampleOrg(belongWithOrg).getUser(name)).thenApply(transactionEvent -> {
-
-            waitOnFabric(0);
-
-            log.info("transaction event is valid " + transactionEvent.isValid()); // must
-            for (BlockInfo.TransactionEnvelopeInfo.TransactionActionInfo info : transactionEvent.getTransactionActionInfos()) {
-                log.info("*************" + info.getResponseMessage());
+        log.info("transactionID==>"+resp.getTransactionID());
+        String result = "";
+        try{
+            BlockEvent.TransactionEvent event =  channel.sendTransaction(successful).get(HyperledgerConfiguration.config.getTransactionWaitTime()
+                    , TimeUnit.SECONDS);
+            //事务处理成功
+            if (event.isValid()) {
+                log.info("事物处理成功");
+                result= "Transaction invoked successfully";
+            } else {
+                log.info("事物处理失败");
+                result= "Transaction invoked Failed";
             }
-            // be
-            // valid
-            // to
-            // be
-            // here.
-            log.info("Finished invoke transaction with transaction id " + transactionEvent.getTransactionID());
+        }catch (Exception e){
+            log.error("IntermediateChaincodeID==>toOrdererResponse==>Exception:"+e.getMessage());
+            result= "Transaction invoked Error";
+        }
 
-            return "Transaction invoked successfully";
-        }).exceptionally(e -> {
-            if (e instanceof TransactionEventException) {
-                BlockEvent.TransactionEvent te = ((TransactionEventException) e).getTransactionEvent();
-                if (te != null) {
-                    log.error(format("Transaction with txid " + te.getTransactionID() + " failed. " + e.getMessage()));
-                }
-            }
 
-            log.error("failed with " + e.getClass().getName() + " exception " + e.getMessage());
-            return "failed with " + e.getClass().getName() + " exception " + e.getMessage();
-        }).get(HyperledgerConfiguration.config.getTransactionWaitTime(), TimeUnit.SECONDS);
+
+//        String result = channel.sendTransaction(successful,HyperledgerConfiguration.config.getSampleOrg(belongWithOrg).getUser(name)).thenApply(transactionEvent -> {
+//
+//            waitOnFabric(0);
+//
+//            log.info("transaction event is valid " + transactionEvent.isValid()); // must
+//            for (BlockInfo.TransactionEnvelopeInfo.TransactionActionInfo info : transactionEvent.getTransactionActionInfos()) {
+//                log.info("*************" + info.getResponseMessage());
+//            }
+//            // be
+//            // valid
+//            // to
+//            // be
+//            // here.
+//            log.info("Finished invoke transaction with transaction id " + transactionEvent.getTransactionID());
+//
+//            return "Transaction invoked successfully";
+//        }).exceptionally(e -> {
+//            if (e instanceof TransactionEventException) {
+//                BlockEvent.TransactionEvent te = ((TransactionEventException) e).getTransactionEvent();
+//                if (te != null) {
+//                    log.error(format("Transaction with txid " + te.getTransactionID() + " failed. " + e.getMessage()));
+//                }
+//            }
+//
+//            log.error("failed with " + e.getClass().getName() + " exception " + e.getMessage());
+//            return "failed with " + e.getClass().getName() + " exception " + e.getMessage();
+//        }).get(HyperledgerConfiguration.config.getTransactionWaitTime(), TimeUnit.SECONDS);
         log.info("Transaction invoked " + result);
 
         return result;
