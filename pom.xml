@@ -14,13 +14,13 @@
 
 	<properties>
 		<grpc.version>1.23.0</grpc.version><!-- CURRENT_GRPC_VERSION -->
-		<protobuf.version>3.9.1</protobuf.version>
-		<bouncycastle.version>1.62</bouncycastle.version>
-		<httpclient.version>4.5.9</httpclient.version>
+		<protobuf.version>3.10.0</protobuf.version>
+		<bouncycastle.version>1.63</bouncycastle.version>
+		<httpclient.version>4.5.10</httpclient.version>
 		<skipITs>true</skipITs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<mysql.version>8.0.13</mysql.version>
+		<mysql.version>8.0.18</mysql.version>
 	</properties>
 
 	<dependencies>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>org.hyperledger.fabric-sdk-java</groupId>
 			<artifactId>fabric-sdk-java</artifactId>
-			<version>1.4.4</version>
+			<version>1.4.7</version>
 		</dependency>
 
 
@@ -73,12 +73,12 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-tcnative-boringssl-static</artifactId>
-			<version>2.0.20.Final</version>
+			<version>2.0.26.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec-http2</artifactId>
-			<version>4.1.32.Final</version>
+			<version>4.1.41.Final</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
 		<dependency>
@@ -183,7 +183,7 @@
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
-			<version>1.23</version>
+			<version>1.25</version>
 		</dependency>
 
 		<dependency>
@@ -243,7 +243,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.13</version>
+			<version>8.0.18</version>
 		</dependency>
 
 		<dependency>
