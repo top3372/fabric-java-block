@@ -1,0 +1,27 @@
+
+## org.springframework.boot.autoconfigure.web.ServerProperties
+server.port: 8203
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+  undertow:
+    buffer-size: 1024
+    direct-buffers: true
+
+  # 配置下面两个值将会走到 ControllerAdvice 全局里面去
+  # org.springframework.boot.autoconfigure.web.WebMvcProperties
+  #  main:
+  #    #允许配置文件中存在相同名字时 覆盖
+  #    allow-bean-definition-overriding: true
+  mvc.throw-exception-if-no-handler-found: true
+  # org.springframework.boot.autoconfigure.web.ResourceProperties
+  resources.add-mappings: false

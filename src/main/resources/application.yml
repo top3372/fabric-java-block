@@ -1,0 +1,12 @@
+
+logging:
+  level:
+    org.xialing: info
+    org.springframework: info
+
+spring:
+  application:
+    name:  block-channel-fabric
+  profiles:
+    active: dev
+
