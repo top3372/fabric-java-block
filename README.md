@@ -33,5 +33,5 @@ sdk工程目录下面artifacts\channel 包含了 证书信息等
 
 api 接口调用详情可以参考 fabric区块链api接口.docx
 
-联系 QQ 181645929
+联系 email top3372@163.com
 
